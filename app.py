@@ -1,36 +1,28 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
-st.title('Uber pickups in NYC')
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+FilePath = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-g-e-JRzeuReeaIvjf6bSFtLTu5PQBQjtKq5uT2R1Wq5XS9oiOLHlC59JNok3TajZ4fvnbSUJO4nI/pub?output=xlsx'
+#st.sidebar.success("Select a demo above.")
+df_data = pd.read_excel(FilePath,sheet_name='DATA', usecols=range(0,10))
+df_data.rename(columns={'Bill / Inv No /Faulty/Sample': 'INV'}, inplace=True)
 
-@st.cache
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+#st.dataframe(df_data)
+df_clstk = pd.read_excel(FilePath,sheet_name='Item_List', usecols=range(0,11))
+df_clstk = df_clstk.drop(columns=['Box Location', 'Physical Date','Net'])
+Total_stock = df_clstk['QTY'].sum()
 
-data_load_state = st.text('Loading data...')
-data = load_data(10000)
-data_load_state.text("Done! (using st.cache)")
+st.title(f"Total Closing Stock Items :  {Total_stock}")
 
-if st.checkbox('Show raw data'):
-    st.subheader('Raw data')
-    st.write(data)
+df_max = df_clstk.iloc[:,[0,2,6,7]]
+df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) & 
+        (df_max['QTY'] > df_max['MAX QTY'])].sort_values(by=('QTY'),
+        ascending=False).reset_index(drop=True)
+st.dataframe(df_max)
 
-st.subheader('Number of pickups by hour')
-hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
-st.bar_chart(hist_values)
-
-# Some number in the range 0-23
-hour_to_filter = st.slider('hour', 0, 23, 17)
-filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
-
-st.subheader('Map of all pickups at %s:00' % hour_to_filter)
-st.map(filtered_data)
+# with col2:
+df_min = df_clstk.iloc[:,[0,2,5,7]]
+df_min = df_min[(df_min['QTY'] > 0) & (df_min['MIN QTY'] > 0) & 
+        (df_min['QTY'] < df_min['MIN QTY'])].sort_values(by=('QTY'),
+        ascending=False).reset_index(drop=True)
+st.dataframe(df_min)
