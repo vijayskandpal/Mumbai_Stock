@@ -9,7 +9,7 @@ st.set_page_config(
     layout='centered'
 )
 
-FilePath = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-g-e-JRzeuReeaIvjf6bSFtLTu5PQBQjtKq5uT2R1Wq5XS9oiOLHlC59JNok3TajZ4fvnbSUJO4nI/pub?output=xlsx'
+FILEPATH = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-g-e-JRzeuReeaIvjf6bSFtLTu5PQBQjtKq5uT2R1Wq5XS9oiOLHlC59JNok3TajZ4fvnbSUJO4nI/pub?output=xlsx'
 #FILEPATH = r'mh-stock.xlsx'
 #st.sidebar.success("Select a demo above.")
 df_data = pd.read_excel(FILEPATH,sheet_name='DATA', usecols=range(0,10))
