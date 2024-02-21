@@ -22,13 +22,14 @@ Total_stock = df_clstk['QTY'].sum()
 
 st.title(f"Total Closing Stock Items :  {Total_stock}")
 
+st.subheader("Available Vs Max")
 df_max = df_clstk.iloc[:,[0,2,6,7]]
 df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) & 
         (df_max['QTY'] > df_max['MAX QTY'])].sort_values(by=('QTY'),
         ascending=False).reset_index(drop=True)
 st.dataframe(df_max)
 
-# with col2:
+st.subheader("Available Vs Min")
 df_min = df_clstk.iloc[:,[0,2,5,7]]
 df_min = df_min[(df_min['QTY'] > 0) & (df_min['MIN QTY'] > 0) & 
         (df_min['QTY'] < df_min['MIN QTY'])].sort_values(by=('QTY'),
