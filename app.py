@@ -30,7 +30,7 @@ df_data.reset_index(drop=True)
 df_clstk = pd.read_excel(FILEPATH,sheet_name='Item_List', usecols=range(0,11))
 df_clstk = df_clstk.drop(columns=['Box Location', 'Physical Date','Net'])
 Total_stock = df_clstk['QTY'].sum()
-df_clstk.sort_values(by=['Category','BRAND','QTY'],ascending=[False,False,False],inplace=True)
+df_clstk.sort_values(by=['Category','BRAND','Item_Code','QTY'],ascending=[False,False,True,False],inplace=True)
 Available_Stock = df_clstk.loc[:,['Item_Code','QTY','Particulars']]
 Available_Stock = Available_Stock[Available_Stock['QTY'] > 0].reset_index(drop=True)
 
