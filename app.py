@@ -1,4 +1,3 @@
-
 """Module providing a function printing python version."""
 from datetime import datetime, timedelta
 import streamlit as st
@@ -37,8 +36,8 @@ Available_Stock = Available_Stock[Available_Stock['QTY'] > 0].reset_index(drop=T
 
 current_datetime = datetime.today().strftime('%d/%m/%Y %H:%M:%S')
 st.header(f"Total Closing Stock Items :  {Total_stock} as on {current_datetime}")
-            
-tab_titles = ['Available Stock Items', 'Available Vs Max', 'Available Vs Min', 'Last Outward 3 Days','Last Inward 3 Days','Search for Stock Items']
+tab_titles = ['Available Stock Items', 'Available Vs Max', 'Available Vs Min', 
+              'Last Outward 3 Days','Last Inward 3 Days','Search for Stock Items']
 tabs = st.tabs(tab_titles)
 
 with tabs[0]:
@@ -48,14 +47,16 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("Available Vs Max")
     df_max = df_clstk.iloc[:,[0,2,6,7]]
-    df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) & (df_max['QTY'] > df_max['MAX QTY'])].reset_index(drop=True)
+    df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) & 
+                    (df_max['QTY'] > df_max['MAX QTY'])].reset_index(drop=True)
     df_max.sort_values(by=('QTY'),ascending=False)
     st.table(df_max)
 
 with tabs[2]:
     st.subheader("Available Vs Min")
     df_min = df_clstk.iloc[:,[0,2,5,7]]
-    df_min = df_min[(df_min['QTY'] != 0) & (df_min['MIN QTY'] != 0) & (df_min['QTY'] < df_min['MIN QTY'])].reset_index(drop=True)
+    df_min = df_min[(df_min['QTY'] != 0) & (df_min['MIN QTY'] != 0) & 
+                    (df_min['QTY'] < df_min['MIN QTY'])].reset_index(drop=True)
     df_max.sort_values(by=('QTY'), ascending=False)
     st.table(df_min)
 
@@ -109,7 +110,6 @@ if keyword:
     filtered_df = filter_dataframe(search_df, keyword)
     if not filtered_df.empty:
         find_stk = filtered_df.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 9]].reset_index(drop=True)
-        #find_stk['INV'] = find_stk['INV'].astype('object')
         find_df = (find_stk.pivot_table(values='IN/OUT Qty', 
                                         columns='IN/OUT', 
                                         index=['Name Client','INV', 'BILL_DATE', 'Mtrl_InOut_Date', 'Remarks'],
@@ -117,17 +117,18 @@ if keyword:
                                         fill_value=0)
                             .reset_index()
         )
-    # Convert string columns to datetime
+        # Convert string columns to datetime
         find_df['Mtrl_InOut_Date'] = pd.to_datetime(find_df['Mtrl_InOut_Date'])
         find_df['BILL_DATE'] = pd.to_datetime(find_df['BILL_DATE'])
-
         # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
         find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
-
+        # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
+        find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
+        # Compute running total of IN - OUT
+        find_df['Running Total'] = find_df['IN'].sub(find_df['OUT'], fill_value=0).cumsum()
         # Format date columns as strings in "dd/mm/yyyy" format
         find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
         find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
-
         # Display the sorted DataFrame
         st.table(find_df)
     else:
