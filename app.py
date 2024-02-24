@@ -34,7 +34,7 @@ df_clstk.sort_values(by=['Category','BRAND','Item_Code','QTY'],ascending=[False,
 Available_Stock = df_clstk.loc[:,['Item_Code','QTY','Particulars']]
 Available_Stock = Available_Stock[Available_Stock['QTY'] > 0].reset_index(drop=True)
 
-current_datetime = datetime.today().strftime('%d/%m/%Y %H:%M:%S')
+current_datetime = datetime.today().strftime('%d/%m/%Y')
 st.header(f"Total Closing Stock Items :  {Total_stock} as on {current_datetime}")
 tab_titles = ['Available Stock Items', 'Available Vs Max', 'Available Vs Min', 
               'Last Outward 3 Days','Last Inward 3 Days','Search for Stock Items']
