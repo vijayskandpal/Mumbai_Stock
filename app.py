@@ -30,13 +30,14 @@ df_data.reset_index(drop=True)
 df_clstk = pd.read_excel(FILEPATH,sheet_name='Item_List', usecols=range(0,11))
 df_clstk = df_clstk.drop(columns=['Box Location', 'Physical Date','Net'])
 Total_stock = df_clstk['QTY'].sum()
-df_clstk.sort_values(by=['Category','BRAND','Item_Code','QTY'],ascending=[False,False,True,False],inplace=True)
+df_clstk.sort_values(by=['Category','BRAND','Item_Code','QTY'],
+                     ascending=[False,False,True,False],inplace=True)
 Available_Stock = df_clstk.loc[:,['Item_Code','QTY','Particulars']]
 Available_Stock = Available_Stock[Available_Stock['QTY'] > 0].reset_index(drop=True)
 
 current_datetime = datetime.today().strftime('%d/%m/%Y')
-st.header(f"Total Closing Stock Items :  {Total_stock} as on {current_datetime}")
-tab_titles = ['Available Stock Items', 'Available Vs Max', 'Available Vs Min', 
+st.header(f"Total Closing Stock Items : {Total_stock} as on {current_datetime}")
+tab_titles = ['Available Stock Items', 'Available Vs Max', 'Available Vs Min',
               'Last Outward 3 Days','Last Inward 3 Days','Search for Stock Items']
 tabs = st.tabs(tab_titles)
 
@@ -47,7 +48,7 @@ with tabs[0]:
 with tabs[1]:
     st.subheader("Available Vs Max")
     df_max = df_clstk.iloc[:,[0,2,6,7]]
-    df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) & 
+    df_max = df_max[(df_max['QTY'] > 0) & (df_max['MAX QTY'] > 0) &
                     (df_max['QTY'] > df_max['MAX QTY'])].reset_index(drop=True)
     df_max.sort_values(by=('QTY'),ascending=False)
     st.table(df_max)
@@ -55,7 +56,7 @@ with tabs[1]:
 with tabs[2]:
     st.subheader("Available Vs Min")
     df_min = df_clstk.iloc[:,[0,2,5,7]]
-    df_min = df_min[(df_min['QTY'] != 0) & (df_min['MIN QTY'] != 0) & 
+    df_min = df_min[(df_min['QTY'] != 0) & (df_min['MIN QTY'] != 0) &
                     (df_min['QTY'] < df_min['MIN QTY'])].reset_index(drop=True)
     df_max.sort_values(by=('QTY'), ascending=False)
     st.table(df_min)
@@ -95,7 +96,7 @@ with tabs[4]:
 with tabs[5]:
     # Define your filter_dataframe function
     def filter_dataframe(search_df: pd.DataFrame, keyword: str) -> pd.DataFrame:
-        # Filter the DataFrame based on the keyword in the ITEM_CODE column
+        """Filter the DataFrame based on the keyword in the ITEM_CODE column"""
         filtered_df = search_df[search_df['ITEM_CODE'] == keyword].copy()
         return filtered_df
 
@@ -110,10 +111,11 @@ with tabs[5]:
         filtered_df = filter_dataframe(search_df, keyword)
         if not filtered_df.empty:
             find_stk = filtered_df.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 9]].reset_index(drop=True)
-            find_df = (find_stk.pivot_table(values='IN/OUT Qty', 
-                                            columns='IN/OUT', 
-                                            index=['Name Client','INV', 'BILL_DATE', 'Mtrl_InOut_Date', 'Remarks'],
-                                            aggfunc='sum', 
+            find_df = (find_stk.pivot_table(values='IN/OUT Qty',
+                                            columns='IN/OUT',
+                                            index=['Name Client','INV', 'BILL_DATE',
+                                                   'Mtrl_InOut_Date', 'Remarks'],
+                                            aggfunc='sum',
                                             fill_value=0)
                                 .reset_index()
             )
@@ -130,21 +132,18 @@ with tabs[5]:
             find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
             find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
             find_df = find_df.reset_index(drop=True)
-# Function to apply style to negative values
+            # Function to apply style to negative values
         def color_negative_red(val):
             color = 'red' if val < 0 else 'black'
             return f'color: {color}'
-
         # Apply style to the 'Running Total' column
-        find_df_styled = find_df.style.applymap(color_negative_red, subset=pd.IndexSlice[:, 'Running Total'])
-
+        find_df_styled = find_df.style.applymap(color_negative_red, 
+                                                subset=pd.IndexSlice[:, 'Running Total'])
         # Render the styled DataFrame
         st.table(find_df_styled)
     else:
         st.write("No matching records found.")
 
-
-# End-of-file (EOF)
 # Display table with custom CSS
 st.write(
     f"""
@@ -159,3 +158,4 @@ st.write(
     """
     , unsafe_allow_html=True
 )
+# End-of-file (EOF)
