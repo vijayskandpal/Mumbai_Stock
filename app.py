@@ -117,21 +117,21 @@ if keyword:
                                         fill_value=0)
                             .reset_index()
         )
-        # Convert string columns to datetime
-            find_df['Mtrl_InOut_Date'] = pd.to_datetime(find_df['Mtrl_InOut_Date'])
-            find_df['BILL_DATE'] = pd.to_datetime(find_df['BILL_DATE'])
-    
-            # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
-            find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
-    
-            # Format date columns as strings in "dd/mm/yyyy" format
-            find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
-            find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
-    
-            # Display the sorted DataFrame
-            st.table(find_df)
-        else:
-            st.write("No matching records found.")
+    # Convert string columns to datetime
+        find_df['Mtrl_InOut_Date'] = pd.to_datetime(find_df['Mtrl_InOut_Date'])
+        find_df['BILL_DATE'] = pd.to_datetime(find_df['BILL_DATE'])
+
+        # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
+        find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
+
+        # Format date columns as strings in "dd/mm/yyyy" format
+        find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
+        find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
+
+        # Display the sorted DataFrame
+        st.table(find_df)
+    else:
+        st.write("No matching records found.")
 
 
 # End-of-file (EOF)
