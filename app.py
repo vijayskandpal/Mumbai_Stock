@@ -92,47 +92,47 @@ with tabs[4]:
     last_inward.drop(columns=['IN/OUT'],inplace=True)
     st.table(last_inward)
 
+with tabs[5]:
+    # Define your filter_dataframe function
+    def filter_dataframe(search_df: pd.DataFrame, keyword: str) -> pd.DataFrame:
+        # Filter the DataFrame based on the keyword in the ITEM_CODE column
+        filtered_df = search_df[search_df['ITEM_CODE'] == keyword].copy()
+        return filtered_df
 
-# Define your filter_dataframe function
-def filter_dataframe(search_df: pd.DataFrame, keyword: str) -> pd.DataFrame:
-    # Filter the DataFrame based on the keyword in the ITEM_CODE column
-    filtered_df = search_df[search_df['ITEM_CODE'] == keyword].copy()
-    return filtered_df
+    # Streamlit UI
+    st.subheader("Search for Stock Items")
 
-# Streamlit UI
-st.subheader("Search for Stock Items")
-
-# Create a select box for the keyword
-keyword_options = search_df['ITEM_CODE'].unique().tolist()
-keyword = st.selectbox("Select keyword:", keyword_options)
-st.subheader(f"Search Items for : {keyword}")
-if keyword:
-    filtered_df = filter_dataframe(search_df, keyword)
-    if not filtered_df.empty:
-        find_stk = filtered_df.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 9]].reset_index(drop=True)
-        find_df = (find_stk.pivot_table(values='IN/OUT Qty', 
-                                        columns='IN/OUT', 
-                                        index=['Name Client','INV', 'BILL_DATE', 'Mtrl_InOut_Date', 'Remarks'],
-                                        aggfunc='sum', 
-                                        fill_value=0)
-                            .reset_index()
-        )
-        # Convert string columns to datetime
-        find_df['Mtrl_InOut_Date'] = pd.to_datetime(find_df['Mtrl_InOut_Date'])
-        find_df['BILL_DATE'] = pd.to_datetime(find_df['BILL_DATE'])
-        # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
-        find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
-        # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
-        find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
-        # Compute running total of IN - OUT
-        find_df['Running Total'] = find_df['IN'].sub(find_df['OUT'], fill_value=0).cumsum()
-        # Format date columns as strings in "dd/mm/yyyy" format
-        find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
-        find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
-        # Display the sorted DataFrame
-        st.table(find_df)
-    else:
-        st.write("No matching records found.")
+    # Create a select box for the keyword
+    keyword_options = search_df['ITEM_CODE'].unique().tolist()
+    keyword = st.selectbox("Select keyword:", keyword_options)
+    st.subheader(f"Search Items for : {keyword}")
+    if keyword:
+        filtered_df = filter_dataframe(search_df, keyword)
+        if not filtered_df.empty:
+            find_stk = filtered_df.iloc[:, [0, 1, 2, 3, 4, 5, 6, 7, 9]].reset_index(drop=True)
+            find_df = (find_stk.pivot_table(values='IN/OUT Qty', 
+                                            columns='IN/OUT', 
+                                            index=['Name Client','INV', 'BILL_DATE', 'Mtrl_InOut_Date', 'Remarks'],
+                                            aggfunc='sum', 
+                                            fill_value=0)
+                                .reset_index()
+            )
+            # Convert string columns to datetime
+            find_df['Mtrl_InOut_Date'] = pd.to_datetime(find_df['Mtrl_InOut_Date'])
+            find_df['BILL_DATE'] = pd.to_datetime(find_df['BILL_DATE'])
+            # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
+            find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
+            # Sort DataFrame by 'Mtrl_InOut_Date' column in ascending order
+            find_df.sort_values(by='Mtrl_InOut_Date', ascending=True, inplace=True)
+            # Compute running total of IN - OUT
+            find_df['Running Total'] = find_df['IN'].sub(find_df['OUT'], fill_value=0).cumsum()
+            # Format date columns as strings in "dd/mm/yyyy" format
+            find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
+            find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
+            # Display the sorted DataFrame
+            st.table(find_df)
+        else:
+            st.write("No matching records found.")
 
 
 # End-of-file (EOF)
