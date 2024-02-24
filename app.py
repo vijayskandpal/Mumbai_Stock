@@ -129,10 +129,19 @@ with tabs[5]:
             # Format date columns as strings in "dd/mm/yyyy" format
             find_df['Mtrl_InOut_Date'] = find_df['Mtrl_InOut_Date'].dt.strftime('%d/%m/%Y')
             find_df['BILL_DATE'] = find_df['BILL_DATE'].dt.strftime('%d/%m/%Y')
-            # Display the sorted DataFrame
-            st.table(find_df)
-        else:
-            st.write("No matching records found.")
+            find_df = find_df.reset_index(drop=True)
+# Function to apply style to negative values
+        def color_negative_red(val):
+            color = 'red' if val < 0 else 'black'
+            return f'color: {color}'
+
+        # Apply style to the 'Running Total' column
+        find_df_styled = find_df.style.applymap(color_negative_red, subset=pd.IndexSlice[:, 'Running Total'])
+
+        # Render the styled DataFrame
+        st.table(find_df_styled)
+    else:
+        st.write("No matching records found.")
 
 
 # End-of-file (EOF)
